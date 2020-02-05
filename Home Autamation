@@ -1,0 +1,68 @@
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <ESP8266WebServer.h>
+
+// credentials for Access Point
+const char* ssid = "Joshua Home Automation";
+const char* password = "Joshua1234";
+
+ESP8266WebServer server(80);
+
+String webPage = "";
+
+int light01_pin = 16;
+int light02_pin = 5;
+
+void setup() {
+ webPage += "<h1>Joshua Home Automation</h1><p>Light #1 <a href=\"light1on\"><button>OFF</button></a>&nbsp;<a href=\"light1off\"><button>ON</button></a></p>";
+ webPage += "<p>Light #2 <a href=\"light2on\"><button>OFF</button></a>&nbsp;<a href=\"light2off\"><button>ON</button></a></p>";
+  // Sets the light pins to OUTPUT mode and sets the default state.
+ pinMode(light01_pin, OUTPUT);
+ digitalWrite(light01_pin, HIGH);
+ pinMode(light02_pin, OUTPUT);
+ digitalWrite(light02_pin, HIGH);
+  delay(1000);
+  // Set the wifi module access point and create a name for it.
+ WiFi.mode(WIFI_AP);
+ WiFi.softAP (ssid, password);
+ // Setting what URL patterns are suppose to do.
+ server.on("/", defaultPage);
+ server.on("/light1on", light01On);
+ server.on("/light1off", light01Off);
+ server.on("/light2on", light02On);
+ server.on("/light2off", light02Off);
+
+ server.begin();
+}
+
+void defaultPage () {
+ server.send(200, "text/html", webPage);
+}
+
+void light01On () {
+ server.send(200, "text/html", webPage);
+ digitalWrite(light01_pin, HIGH);
+ delay(1000);
+}
+
+void light1Off () {
+ server.send(200, "text/html", webPage);
+ digitalWrite(light01_pin, LOW);
+ delay(1000);
+}
+
+void light2On () {
+ server.send(200, "text/html", webPage);
+ digitalWrite(light02_pin, HIGH);
+ delay(1000);
+}
+
+void light2Off () {
+ server.send(200, "text/html", webPage);
+ digitalWrite(light02_pin, LOW);
+ delay(1000);
+}
+
+void loop() {
+ server.handleClient();
+}
